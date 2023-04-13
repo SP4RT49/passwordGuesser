@@ -1,51 +1,117 @@
 import random
 import string
 import datetime
+import unicodedata
 
+class PasswordGenerator:
+    def __init__(self, words, dates, options):
+        self.words = words
+        self.dates = dates
+        self.options = options
+        self.passwords = []
 
-def DateSplit():
-    # Split de la date pour récupérer les informations souhaitées
-    dateChoose = "19 Nov 2015  18:45:00.000"
-    date = datetime.datetime.strptime(dateChoose, "%d %b %Y  %H:%M:%S.%f")
+    def generate_passwords(self):
+        word_variations = []
+        for word in self.words:
+            if self.options["lowercase"]:
+                word_variations.append(self.lowercase(word))
+            if self.options["uppercase"]:
+                word_variations.append(self.uppercase(word))
+            if self.options["capitalize"]:
+                word_variations.append(self.capitalize(word))
+            if self.options["remove_accents"]:
+                word_variations.append(self.remove_accents(word))
+            if self.options["l33t"]:
+                word_variations += self.l33t(word)
 
-    annee = date.year
-    mois = date.month
-    jour = date.day
-    heure = date.hour
-    minute = date.minute
-    seconde = date.second
-    print(jour, "/", mois, "/", annee)
+        for date in self.dates:
+            date_variations = self.extract_date_info(date)
+            for word_variation in word_variations:
+                for date_variation in date_variations:
+                    self.passwords.append(self.combine(word_variation, date_variation))
 
+    def lowercase(self, word):
+        return word.lower()
 
-print(DateSplit())
+    def uppercase(self, word):
+        return word.upper()
 
+    def capitalize(self, word):
+        return word.capitalize()
 
-# -----------------------------
-Tab1 = ["A", "B", "C", "D"]
-Tab2 = ["1", "2", "3", "4"]
-Tab1_length = len(Tab1)
-password_length = 5
+    def remove_accents(self, word):
+        return unicodedata.normalize("NFKD", word).encode("ASCII", "ignore").decode("utf-8")
 
-letters = string.ascii_letters
-digits = string.digits
-special_chars = string.punctuation
+    def l33t(self, word):
+        variations = []
+        replacements = {
+            "a": ["@", "4", "/-\\"],
+            "e": ["3", "€", "ë"],
+            "i": ["1", "!", "|"],
+            "o": ["0", "()", "[]"],
+            "s": ["5", "$", "§"],
+            "t": ["7", "+"],
+        }
+        for letter in word:
+            if letter.lower() in replacements:
+                for replacement in replacements[letter.lower()]:
+                    new_word = word.replace(letter, replacement)
+                    if new_word != word:
+                        variations.append(new_word)
+        return variations
 
-#  élément aléatoirement de la liste
-def Random(Tab1):
-    return random.choice(Tab1)
+    def extract_date_info(self, date_str):
+        date = datetime.datetime.strptime(date_str, "%d %b %Y %H:%M:%S.%f")
+        year2 = str(date.year)[-2:]
+        year4 = str(date.year)
+        month = self.get_month(date.month)
+        day = str(date.day)
+        hour = str(date.hour)
+        minute = str(date.minute)
+        second = str(date.second)
+        return [year2, year4, month, day, hour, minute, second]
 
+    def get_month(self, month_num):
+        months = [
+            "janvier",
+            "février",
+            "mars",
+            "avril",
+            "mai",
+            "juin",
+            "juillet",
+            "août",
+            "septembre",
+            "octobre",
+            "novembre",
+            "décembre",
+        ]
+        return months[month_num - 1]
 
-print("##################")
-print("#      " + Random(Tab2) + Random(Tab1))
-print("##################")
+    def combine(self, word, date_info):
+        return "".join(random.sample(word + "".join(date_info), len(word) + len(date_info)))
+    
+options = {
+    "lowercase" : True,
+    "uppercase" : True,
+    "capitalize" : True,
+    "remove_accents" : True,
+    "l33t" : True,
+}
 
+# Liste des mots
+wordList = [
+    "Cheval",
+    "BK",
+    "ZoO",
+    "Attribution",
+]
+# Liste des dates
+dateList = [
+    "19 Nov 2015 18:45:00.000",
+    "20 Nov 2015 19:45:00.000",
+]
 
-Tab1_list = [random.choice(Tab1) for i in range(Tab1_length)]
-print(Tab1_list)
-
-word_list = letters + digits + special_chars
-password = ""
-for i in range(password_length):
-    password += "".join(random.choice(word_list))
-
-print(password)
+pg = PasswordGenerator(wordList, dateList, options)
+pg.generate_passwords()
+print(pg.passwords)
