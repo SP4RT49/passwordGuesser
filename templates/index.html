@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../static/src/css/style.css">
     <title>Password Guesser</title>
 </head>
 <header>
@@ -18,10 +18,10 @@
 </header>
 
 <body>
-    <div class="body_container">
+    <div class="body_container col-12 row">
         <h1>Password Guesser</h1>
         <!-- Formulaire -->
-        <div class="form_container">
+        <div class="form_container col-5">
             <div class="form_group">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="floatingInput" placeholder="Doh">
@@ -42,7 +42,7 @@
         </div>
 
         <!-- Liste des mots de passes -->
-        <div class="form_container mt-3">
+        <div class="form_container overScroll col-5">
             <h3>Listes des mots de passes devinés</h3>
             <div class="word_group">
                 <div class="btn_content">
@@ -63,11 +63,63 @@
                 <div class="btn_content">
                     <span>Mot</span>
                 </div>
-
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
+                <div class="btn_content">
+                    <span>Mot</span>
+                </div>
             </div>
 
         </div>
     </div>
+
+    <!-- <h1>Password Generator</h1>
+	<form method="POST" action="/generate_password">
+		<label for="words">Liste de mots :</label><br>
+		<textarea id="words" name="words" rows="5" cols="50"></textarea><br><br>
+		<label for="dates">Liste de dates :</label><br>
+		<textarea id="dates" name="dates" rows="5" cols="50"></textarea><br><br>
+		<input type="submit" value="Générer">
+	</form>
+	{% if passwords %}
+		<h2>Résultats :</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Mot de passe</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for password in passwords %}
+					<tr>
+						<td>{{ password }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	{% endif %} -->
 
 
 

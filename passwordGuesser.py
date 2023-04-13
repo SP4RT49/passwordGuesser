@@ -1,7 +1,10 @@
+from flask import Flask, render_template
 import random
 import string
 import datetime
 import unicodedata
+
+app = Flask(__name__)
 
 class PasswordGenerator:
     def __init__(self, words, dates, options):
@@ -13,22 +16,25 @@ class PasswordGenerator:
     def generate_passwords(self):
         word_variations = []
         for word in self.words:
+            variations = [word]
             if self.options["lowercase"]:
-                word_variations.append(self.lowercase(word))
+                variations.append(self.lowercase(word))
             if self.options["uppercase"]:
-                word_variations.append(self.uppercase(word))
+                variations.append(self.uppercase(word))
             if self.options["capitalize"]:
-                word_variations.append(self.capitalize(word))
+                variations.append(self.capitalize(word))
             if self.options["remove_accents"]:
-                word_variations.append(self.remove_accents(word))
+                variations.append(self.remove_accents(word))
             if self.options["l33t"]:
-                word_variations += self.l33t(word)
+                variations += self.l33t(word)
+            word_variations += variations
 
         for date in self.dates:
             date_variations = self.extract_date_info(date)
             for word_variation in word_variations:
                 for date_variation in date_variations:
                     self.passwords.append(self.combine(word_variation, date_variation))
+
 
     def lowercase(self, word):
         return word.lower()
@@ -90,7 +96,7 @@ class PasswordGenerator:
 
     def combine(self, word, date_info):
         return "".join(random.sample(word + "".join(date_info), len(word) + len(date_info)))
-    
+
 options = {
     "lowercase" : True,
     "uppercase" : True,
@@ -117,3 +123,12 @@ pg.generate_passwords()
 pswList = pg.passwords
 print(pswList)
 print(len(pswList))
+
+# Route pour la page d'accueil
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# Lancement de l'application Flask
+if __name__ == '__main__':
+    app.run(debug=True)
