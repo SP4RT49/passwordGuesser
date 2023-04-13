@@ -114,4 +114,6 @@ dateList = [
 
 pg = PasswordGenerator(wordList, dateList, options)
 pg.generate_passwords()
-print(pg.passwords)
+pswList = pg.passwords
+print(pswList)
+print(len(pswList))
