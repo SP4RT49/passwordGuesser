@@ -14,26 +14,41 @@ class PasswordGenerator:
         self.passwords = []
 
     def generate_passwords(self):
-        word_variations = []
+        password_variations = []
+        word_variations = {
+            "original": [],
+            "lowercase": [],
+            "uppercase": [],
+            "capitalize": [],
+            "remove_accents": [],
+            "l33t": [],
+        }
         for word in self.words:
-            variations = [word]
+            word_variations["original"].append(word)
             if self.options["lowercase"]:
-                variations.append(self.lowercase(word))
+                word_variations["lowercase"].append(self.lowercase(word))
             if self.options["uppercase"]:
-                variations.append(self.uppercase(word))
+                word_variations["uppercase"].append(self.uppercase(word))
             if self.options["capitalize"]:
-                variations.append(self.capitalize(word))
+                word_variations["capitalize"].append(self.capitalize(word))
             if self.options["remove_accents"]:
-                variations.append(self.remove_accents(word))
+                word_variations["remove_accents"].append(self.remove_accents(word))
             if self.options["l33t"]:
-                variations += self.l33t(word)
-            word_variations += variations
+                for l33t_word in self.l33t(word):
+                    word_variations["l33t"].append(l33t_word)
 
+        date_variations = []
         for date in self.dates:
-            date_variations = self.extract_date_info(date)
-            for word_variation in word_variations:
+            date_variations += self.extract_date_info(date)
+
+        for word_variation in word_variations.values():
+            variation_passwords = []
+            for word in word_variation:
                 for date_variation in date_variations:
-                    self.passwords.append(self.combine(word_variation, date_variation))
+                    variation_passwords.append(self.combine(word, date_variation))
+            password_variations.append(variation_passwords)
+        
+        self.passwords = [pw for variation in password_variations for pw in variation]
 
 
     def lowercase(self, word):
@@ -49,7 +64,7 @@ class PasswordGenerator:
         return unicodedata.normalize("NFKD", word).encode("ASCII", "ignore").decode("utf-8")
 
     def l33t(self, word):
-        variations = []
+        variations = [word]
         replacements = {
             "a": ["@", "4", "/-\\"],
             "e": ["3", "€", "ë"],
@@ -60,11 +75,21 @@ class PasswordGenerator:
         }
         for letter in word:
             if letter.lower() in replacements:
+                new_variations = []
                 for replacement in replacements[letter.lower()]:
-                    new_word = word.replace(letter, replacement)
-                    if new_word != word:
-                        variations.append(new_word)
+                    for variation in variations:
+                        new_word = variation[:variation.index(letter)] + replacement + variation[variation.index(letter) + 1:]
+                        new_variations.append(new_word)
+                variations += new_variations
+            elif letter.upper() in replacements:
+                new_variations = []
+                for replacement in replacements[letter.upper()]:
+                    for variation in variations:
+                        new_word = variation[:variation.index(letter)] + replacement + variation[variation.index(letter) + 1:]
+                        new_variations.append(new_word)
+                variations += new_variations
         return variations
+
 
     def extract_date_info(self, date_str):
         date = datetime.datetime.strptime(date_str, "%d %b %Y %H:%M:%S.%f")
@@ -107,15 +132,13 @@ options = {
 
 # Liste des mots
 wordList = [
-    "Cheval",
-    "BK",
-    "ZoO",
-    "Attribution",
+    "Jours",
+    "Mois",
+    "Année",
 ]
 # Liste des dates
 dateList = [
     "19 Nov 2015 18:45:00.000",
-    "20 Nov 2015 19:45:00.000",
 ]
 
 pg = PasswordGenerator(wordList, dateList, options)
