@@ -8,120 +8,142 @@
     <link rel="stylesheet" href="../static/src/css/style.css">
     <title>Password Guesser</title>
 </head>
-<header>
-    <nav>
-        <ul>
-            <li><a href="">Accueil</a></li>
-            <li><a href="">Liste</a></li>
-        </ul>
-    </nav>
-</header>
 
 <body>
     <div class="body_container col-12 row">
         <h1>Password Guesser</h1>
         <!-- Formulaire -->
-        <div class="form_container col-5">
-            <div class="form_group">
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="floatingInput" placeholder="Doh">
-                    <label for="floatingInput">Mot 1</label>
+        <div class="form_container col-5 overScroll">
+            <form method="POST">
+                <div class="col-12 d-flex justify-content-around">
+                    <div class="col-5">
+                        <h5 class="text-light">Options</h5>
+                        <div class="container bg-light rounded-2 my-2 d-flex justify-content-center">
+                            <div class="d-flex justify-content-around align-items-center col-12 flex-wrap">
+                                <div class="col-4 my-2 mx-1">
+                                    <label>
+                                        <input type="checkbox" name="lowercase"> Minus.
+                                    </label>
+                                </div>
+                                <div class="col-4 my-2 mx-1">
+                                    <label>
+                                        <input type="checkbox" name="uppercase"> Majus.
+                                    </label>
+                                </div>
+                                <div class="col-4 my-2 mx-1">
+                                    <label>
+                                        <input type="checkbox" name="capitalize"> Capit.
+                                    </label>
+                                </div>
+                                <div class="col-4 my-2 mx-1">
+                                    <label>
+                                        <input type="checkbox" name="remove_accents"> Supp. accents
+                                    </label>
+                                </div>
+                                <div class="col-4 my-2 mx-1">
+                                    <label>
+                                        <input type="checkbox" name="l33t"> L33t speak
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="text-light">Informations</h5>
+                        <div class="form_group d-flex flex-wrap col-12 justify-content-center">
+                            <div id="addWord" class="form_group d-flex flex-wrap col-12 justify-content-center">
+                                <div class="form-floating mb-3 col-5">
+                                    <input type="text" class="form-control" id="word-input" name="word"
+                                        placeholder="Mot">
+                                    <label for="word-input">Mot :</label>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3 col-10">
+                                <button type="button" class="form-control" onclick="addWord()">Ajouter un Mot</button>
+                            </div>
+                            <div id="addDate" class="form_group d-flex flex-wrap col-12 justify-content-center">
+                                <div class="form-floating mb-3 col-5">
+                                    <input type="date" class="form-control" id="date-input" placeholder="Date :"
+                                        name="date">
+                                    <label for="date-input">Date :</label>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3 col-10">
+                                <button type="button" class="form-control" onclick="addDate()">Ajouter une Date</button>
+                            </div>
+                            
+                        </div>
+
+                        <!-- Champs de mots et de dates ajoutés dynamiquement -->
+                        <script>
+                            function addWord() {
+                                var container = document.getElementById('addWord');
+                                var newField = document.createElement('div');
+                                newField.classList.add('form-floating', 'mb-3', 'col-5');
+                                var wordCounter = document.querySelectorAll('input[name^="word"]').length + 1;
+                                newField.innerHTML = `
+                                        <input type="text" class="form-control" id="word-input${wordCounter}" name="word${wordCounter}" placeholder="Mot">
+                                        <label for="word-input${wordCounter}">Mot :</label>
+                                `;
+                                container.appendChild(newField);
+                            }
+                        
+                            function addDate() {
+                                var container = document.getElementById('addDate');
+                                var newField = document.createElement('div');
+                                newField.classList.add('form-floating', 'mb-3', 'col-5');
+                                var dateCounter = document.querySelectorAll('input[name^="date"]').length + 1;
+                                newField.innerHTML = `
+                                    <input type="date" class="form-control" id="date-input${dateCounter}" placeholder="Date :" name="date${dateCounter}">
+                                    <label for="date-input${dateCounter}">Date :</label>
+                                `;
+                                container.appendChild(newField);
+                            }
+
+                            function handleSubmit() {
+                                var dateInputs = document.querySelectorAll('input[name^="date"]');
+                                var validDates = true;
+
+                                // Vérifier si tous les champs de date sont remplis
+                                for (var i = 0; i < dateInputs.length; i++) {
+                                    if (dateInputs[i].value === '') {
+                                        validDates = false;
+                                        break;
+                                    }
+                                }
+
+                                if (validDates) {
+                                    // Soumettre le formulaire
+                                    document.querySelector('form').submit();
+                                } else {
+                                    // Afficher un message d'erreur ou prendre une autre action appropriée
+                                    alert('Veuillez remplir tous les champs de date.');
+                                }
+                            }
+                        </script>
+                        
+
+                    </div>
                 </div>
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="floatingInput" placeholder="John">
-                    <label for="floatingInput">Mot 2</label>
+                <div class="form-floating mt-5">
+                    <button type="submit" class="btn_content">Générer les mots de passe</button>
                 </div>
-                <div class="form-floating">
-                    <input type="date" class="form-control" id="floatingPassword" placeholder="Password">
-                    <label for="floatingPassword">Date</label>
-                </div>
-            </div>
-            <div class="form-floating mt-5">
-                <input type="submit" class="btn_content" value="Deviner">
-            </div>
+            </form>
         </div>
 
         <!-- Liste des mots de passes -->
-        <div class="form_container overScroll col-5">
+        <div class="form_container col-5">
             <h3>Listes des mots de passes devinés</h3>
-            <div class="word_group">
+            <div class="word_group overScroll">
+                {% for password in passwords %}
                 <div class="btn_content">
-                    <span>Mot</span>
+                    <span>{{ password }}</span>
                 </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
-                <div class="btn_content">
-                    <span>Mot</span>
-                </div>
+                {% endfor %}
             </div>
 
         </div>
     </div>
-
-    <!-- <h1>Password Generator</h1>
-	<form method="POST" action="/generate_password">
-		<label for="words">Liste de mots :</label><br>
-		<textarea id="words" name="words" rows="5" cols="50"></textarea><br><br>
-		<label for="dates">Liste de dates :</label><br>
-		<textarea id="dates" name="dates" rows="5" cols="50"></textarea><br><br>
-		<input type="submit" value="Générer">
-	</form>
-	{% if passwords %}
-		<h2>Résultats :</h2>
-		<table>
-			<thead>
-				<tr>
-					<th>Mot de passe</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for password in passwords %}
-					<tr>
-						<td>{{ password }}</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	{% endif %} -->
-
-
 
     <!-- scripts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"

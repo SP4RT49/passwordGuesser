@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import random
 import string
 import datetime
@@ -7,13 +7,11 @@ import unicodedata
 app = Flask(__name__)
 
 class PasswordGenerator:
-    def __init__(self, words, dates, options):
-        self.words = words
-        self.dates = dates
+    def __init__(self, options):
         self.options = options
         self.passwords = []
 
-    def generate_passwords(self):
+    def generate_passwords(self, words, dates):
         password_variations = []
         word_variations = {
             "original": [],
@@ -23,7 +21,7 @@ class PasswordGenerator:
             "remove_accents": [],
             "l33t": [],
         }
-        for word in self.words:
+        for word in words:
             word_variations["original"].append(word)
             if self.options["lowercase"]:
                 word_variations["lowercase"].append(self.lowercase(word))
@@ -38,7 +36,7 @@ class PasswordGenerator:
                     word_variations["l33t"].append(l33t_word)
 
         date_variations = []
-        for date in self.dates:
+        for date in dates:
             date_variations += self.extract_date_info(date)
 
         for word_variation in word_variations.values():
@@ -92,7 +90,7 @@ class PasswordGenerator:
 
 
     def extract_date_info(self, date_str):
-        date = datetime.datetime.strptime(date_str, "%d %b %Y %H:%M:%S.%f")
+        date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
         year2 = str(date.year)[-2:]
         year4 = str(date.year)
         month = self.get_month(date.month)
@@ -101,6 +99,7 @@ class PasswordGenerator:
         minute = str(date.minute)
         second = str(date.second)
         return [year2, year4, month, day, hour, minute, second]
+
 
     def get_month(self, month_num):
         months = [
@@ -122,34 +121,57 @@ class PasswordGenerator:
     def combine(self, word, date_info):
         return "".join(random.sample(word + "".join(date_info), len(word) + len(date_info)))
 
-options = {
-    "lowercase" : True,
-    "uppercase" : True,
-    "capitalize" : True,
-    "remove_accents" : True,
-    "l33t" : True,
-}
 
-# Liste des mots
-wordList = [
-    "Jours",
-    "Mois",
-    "Année",
-]
-# Liste des dates
-dateList = [
-    "19 Nov 2015 18:45:00.000",
-]
+# Utilisation de l'encapsulation
+class DynamicFields:
+    def __init__(self, num_fields):
+        self.num_fields = num_fields
+        self.words = []
+        self.dates = []
 
-pg = PasswordGenerator(wordList, dateList, options)
-pg.generate_passwords()
-pswList = pg.passwords
-print(pswList)
-print(len(pswList))
+    def add_field(self, word, date):
+        self.words.append(word)
+        self.dates.append(date)
 
-# Route pour la page d'accueil
-@app.route('/')
+
+# Utilisation de l'héritage
+class CustomPasswordGenerator(PasswordGenerator):
+    def __init__(self, options, dynamic_fields):
+        super().__init__(options)
+        self.dynamic_fields = dynamic_fields
+
+    def generate_passwords(self):
+        words = [field.word for field in self.dynamic_fields.words]
+        dates = [field.date for field in self.dynamic_fields.dates]
+        super().generate_passwords(words, dates)
+
+
+@app.route('/', methods=['GET', 'POST'])
 def home():
+    if request.method == 'POST':
+        options = {
+            "lowercase" : "lowercase" in request.form,
+            "uppercase" : "uppercase" in request.form,
+            "capitalize" : "capitalize" in request.form,
+            "remove_accents" : "remove_accents" in request.form,
+            "l33t" : "l33t" in request.form,
+        }
+        
+        words = []
+        dates = []
+
+        for key, value in request.form.items():
+            if key.startswith("word"):
+                words.append(value)
+            elif key.startswith("date"):
+                dates.append(value)
+
+        pg = PasswordGenerator(options)
+        pg.generate_passwords(words, dates)
+        passwords = pg.passwords
+
+        return render_template('index.html', passwords=passwords)
+
     return render_template('index.html')
 
 # Lancement de l'application Flask
